@@ -1,8 +1,22 @@
 import { BlogModel, IBlogDocument } from './blog.model.js';
-import { IBlogCreate, IBlogUpdate, IBlogFilters } from './blog.types.js';
+import { IBlogUpdate, IBlogFilters } from './blog.types.js';
+
+interface IBlogCreateInternal {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  coverImage?: string;
+  authorId: string;
+  categoryId?: string;
+  tags: string[];
+  status: 'draft' | 'published';
+  isPublic: boolean;
+}
 
 export class BlogRepository {
-  async create(blogData: IBlogCreate & { id: string; slug: string; authorId: string; excerpt: string }): Promise<IBlogDocument> {
+  async create(blogData: IBlogCreateInternal): Promise<IBlogDocument> {
     const blog = new BlogModel(blogData);
     return await blog.save();
   }
