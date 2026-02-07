@@ -20,7 +20,7 @@ export class BlogController {
 
   async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { blogId } = req.params;
+      const blogId = req.params.blogId as string;
       const blog = await blogService.getById(blogId, true);
       res.status(200).json({ success: true, data: blog });
     } catch (error) {
@@ -30,7 +30,7 @@ export class BlogController {
 
   async getBySlug(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { slug } = req.params;
+      const slug = req.params.slug as string;
       const blog = await blogService.getBySlug(slug, true);
       res.status(200).json({ success: true, data: blog });
     } catch (error) {
@@ -57,7 +57,7 @@ export class BlogController {
 
   async getByAuthor(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { authorId } = req.params;
+      const authorId = req.params.authorId as string;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const requesterId = req.user?.userId;
@@ -76,7 +76,7 @@ export class BlogController {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
       }
-      const { blogId } = req.params;
+      const blogId = req.params.blogId as string;
       const updateData: IBlogUpdate = req.body;
       const blog = await blogService.update(blogId, authorId, updateData);
       res.status(200).json({ success: true, data: blog });
@@ -92,7 +92,7 @@ export class BlogController {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
       }
-      const { blogId } = req.params;
+      const blogId = req.params.blogId as string;
       await blogService.delete(blogId, authorId);
       res.status(200).json({ success: true, message: 'Blog deleted successfully' });
     } catch (error) {
@@ -107,7 +107,7 @@ export class BlogController {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
       }
-      const { blogId } = req.params;
+      const blogId = req.params.blogId as string;
       const blog = await blogService.publish(blogId, authorId);
       res.status(200).json({ success: true, data: blog });
     } catch (error) {
@@ -122,7 +122,7 @@ export class BlogController {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
       }
-      const { blogId } = req.params;
+      const blogId = req.params.blogId as string;
       const blog = await blogService.unpublish(blogId, authorId);
       res.status(200).json({ success: true, data: blog });
     } catch (error) {
@@ -142,7 +142,7 @@ export class BlogController {
 
   async getByTag(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { tag } = req.params;
+      const tag = req.params.tag as string;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await blogService.getByTag(tag, page, limit);

@@ -21,8 +21,9 @@ export class LikeController {
   async getLikeStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.userId;
-      const { targetId, targetType } = req.params;
-      const result = await likeService.getLikeStatus(userId, targetId, targetType as 'blog' | 'comment');
+      const targetId = req.params.targetId as string;
+      const targetType = req.params.targetType as 'blog' | 'comment';
+      const result = await likeService.getLikeStatus(userId, targetId, targetType);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -48,10 +49,11 @@ export class LikeController {
 
   async getTargetLikers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { targetId, targetType } = req.params;
+      const targetId = req.params.targetId as string;
+      const targetType = req.params.targetType as 'blog' | 'comment';
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
-      const result = await likeService.getTargetLikers(targetId, targetType as 'blog' | 'comment', page, limit);
+      const result = await likeService.getTargetLikers(targetId, targetType, page, limit);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
       next(error);
