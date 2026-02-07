@@ -1,8 +1,17 @@
 {
-  "name": "backend-ts",
+  "name": "epic-blog-api",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "description": "Epic Blog API with Node.js, TypeScript, and MongoDB",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["blog", "api", "typescript", "mongodb"],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
@@ -16,12 +25,9 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.2.1",
-    "@types/uuid": "^11.0.0",
     "nodemon": "^3.1.11",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
