@@ -173,10 +173,11 @@ class BlogAPITester:
         success = status == 201 and data.get('success') == True
         
         if success:
-            # Try different possible paths for blog ID
-            blog = data.get('data', {}).get('blog', {})
-            self.blog_id = blog.get('id') or blog.get('_id') or blog.get('blogId')
+            # Blog ID is directly in data
+            self.blog_id = data.get('data', {}).get('id')
             print(f"🔍 Created blog ID: {self.blog_id}")
+            if not self.blog_id:
+                print(f"🔍 Blog response: {data}")
         
         self.log_test("Create Blog Post", success, data,
                      None if success else f"Status: {status}, Response: {data}")
