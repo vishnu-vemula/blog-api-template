@@ -247,7 +247,8 @@ class BlogAPITester:
         success = status == 201 and data.get('success') == True
         
         if success:
-            self.comment_id = data.get('data', {}).get('comment', {}).get('id')
+            # Comment ID is directly in data
+            self.comment_id = data.get('data', {}).get('id')
         
         self.log_test("Create Comment", success, data,
                      None if success else f"Status: {status}, Response: {data}")
