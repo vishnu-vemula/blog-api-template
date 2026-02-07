@@ -161,17 +161,24 @@ class BlogAPITester:
             "title": f"Test Blog Post {datetime.now().strftime('%H%M%S')}",
             "content": "<h1>Test Content</h1><p>This is a test blog post with HTML content.</p>",
             "excerpt": "This is a test excerpt",
-            "categoryId": self.category_id,
             "tags": ["test", "blog", "api"],
             "status": "draft",
             "isPublic": True
         }
         
+        # Only add categoryId if we have one
+        if self.category_id:
+            blog_data["categoryId"] = self.category_id
+            print(f"🔍 Using category ID: {self.category_id}")
+        
         status, data = self.make_request('POST', 'blogs', blog_data)
         success = status == 201 and data.get('success') == True
         
         if success:
-            self.blog_id = data.get('data', {}).get('blog', {}).get('id')
+            # Try different possible paths for blog ID
+            blog = data.get('data', {}).get('blog', {})
+            self.blog_id = blog.get('id') or blog.get('_id') or blog.get('blogId')
+            print(f"🔍 Created blog ID: {self.blog_id}")
         
         self.log_test("Create Blog Post", success, data,
                      None if success else f"Status: {status}, Response: {data}")
