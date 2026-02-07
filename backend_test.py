@@ -81,7 +81,8 @@ class BlogAPITester:
         success = status == 201 and data.get('success') == True
         
         if success:
-            self.user_id = data.get('data', {}).get('user', {}).get('id')
+            # User ID is directly in data 
+            self.user_id = data.get('data', {}).get('id')
         
         self.log_test("User Registration", success, data,
                      None if success else f"Status: {status}, Response: {data}")
