@@ -13,7 +13,7 @@ const likeSchema = new Schema<ILikeDocument>(
   {
     timestamps: { createdAt: true, updatedAt: false },
     toJSON: {
-      transform: (_, ret) => {
+      transform: (_, ret: Record<string, unknown>) => {
         delete ret._id;
         delete ret.__v;
         return ret;

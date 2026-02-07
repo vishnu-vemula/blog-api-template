@@ -17,7 +17,7 @@ const commentSchema = new Schema<ICommentDocument>(
   {
     timestamps: true,
     toJSON: {
-      transform: (_, ret) => {
+      transform: (_, ret: Record<string, unknown>) => {
         delete ret._id;
         delete ret.__v;
         return ret;
