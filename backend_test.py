@@ -99,6 +99,7 @@ class BlogAPITester:
         success = status == 200 and data.get('success') == True
         
         if success:
+            # Token is directly in data
             self.token = data.get('data', {}).get('token')
         
         self.log_test("User Login", success, data,
