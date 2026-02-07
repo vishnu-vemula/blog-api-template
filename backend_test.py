@@ -137,11 +137,9 @@ class BlogAPITester:
         success = status == 201 and data.get('success') == True
         
         if success:
-            # Try different possible paths for category ID
-            category = data.get('data', {}).get('category', {})
-            self.category_id = category.get('id') or category.get('_id') or category.get('categoryId')
+            # Category ID is directly in data
+            self.category_id = data.get('data', {}).get('id')
             print(f"🔍 Created category ID: {self.category_id}")
-            print(f"🔍 Category response: {data}")
         
         self.log_test("Create Category", success, data,
                      None if success else f"Status: {status}, Response: {data}")
