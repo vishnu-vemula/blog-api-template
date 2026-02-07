@@ -36,7 +36,7 @@ export class UserService {
       email: user.email,
       role: user.role,
     };
-    return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
+    return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn } as jwt.SignOptions);
   }
 
   async register(userData: IUserCreate): Promise<IAuthResponse> {
