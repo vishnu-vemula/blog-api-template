@@ -71,17 +71,26 @@ export class BlogService {
     const slug = this.generateSlug(blogData.title);
     const excerpt = blogData.excerpt || this.generateExcerpt(blogData.content);
 
-    const blog = await blogRepository.create({
-      ...blogData,
+    const blogInput = {
+      title: blogData.title,
+      content: blogData.content,
+      excerpt,
+      coverImage: blogData.coverImage,
+      categoryId: blogData.categoryId,
+      tags: blogData.tags || [],
+      status: blogData.status || 'draft' as const,
+      isPublic: blogData.isPublic !== undefined ? blogData.isPublic : true,
       id: uuidv4(),
       slug,
       authorId,
-      excerpt,
-      tags: blogData.tags || [],
-      status: blogData.status || 'draft',
-      isPublic: blogData.isPublic !== undefined ? blogData.isPublic : true,
-      publishedAt: blogData.status === 'published' ? new Date() : undefined,
-    });
+    };
+
+    const blog = await blogRepository.create(blogInput);
+
+    // Update publishedAt if published
+    if (blogData.status === 'published') {
+      await blogRepository.update(blog.id, { publishedAt: new Date() } as unknown as IBlogUpdate);
+    }
 
     return await this.toBlogResponse(blog);
   }
