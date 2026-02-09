@@ -25,7 +25,6 @@ const categorySchema = new Schema<ICategoryDocument>(
   }
 );
 
-categorySchema.index({ slug: 1 });
 categorySchema.index({ parentId: 1 });
 
 export const CategoryModel = mongoose.model<ICategoryDocument>('Category', categorySchema);

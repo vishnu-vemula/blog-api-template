@@ -3,6 +3,8 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
+import rateLimit from 'express-rate-limit';
+import hpp from 'hpp';
 
 // Import routes
 import { userRoutes } from './features/users/index.js';
@@ -10,6 +12,7 @@ import { blogRoutes } from './features/blogs/index.js';
 import { categoryRoutes } from './features/categories/index.js';
 import { commentRoutes } from './features/comments/index.js';
 import { likeRoutes } from './features/likes/index.js';
+import { apiKeyRoutes } from './features/api-keys/index.js';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware.js';
@@ -18,8 +21,7 @@ const app: Application = express();
 
 // Environment variables
 const PORT = process.env.PORT || 4000;
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017';
-const DB_NAME = process.env.DB_NAME || 'epic_blog_db';
+const MONGO_URL = process.env.MONGO_URL;
 const CORS_ORIGINS = process.env.CORS_ORIGINS || '*';
 
 // Middleware
@@ -28,8 +30,22 @@ app.use(cors({
   origin: CORS_ORIGINS === '*' ? '*' : CORS_ORIGINS.split(','),
   credentials: true,
 }));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+});
+app.use('/api', limiter);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Prevent parameter pollution
+app.use(hpp());
 
 // Health check endpoint
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -47,6 +63,7 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/likes', likeRoutes);
+app.use('/api/api-keys', apiKeyRoutes);
 
 // Root endpoint
 app.get('/api', (_req: Request, res: Response) => {
@@ -119,16 +136,20 @@ app.use(errorHandler);
 const startServer = async (): Promise<void> => {
   try {
     console.log('Connecting to MongoDB...');
-    await mongoose.connect(`${MONGO_URL}/${DB_NAME}`);
-    console.log('✅ Connected to MongoDB');
+    console.log('Using MONGO_URL:', MONGO_URL); // Debug log
+    if (!MONGO_URL) {
+      throw new Error('MONGO_URL is not defined in environment variables');
+    }
+    await mongoose.connect(MONGO_URL);
+    console.log(' Connected to MongoDB');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Epic Blog API is running on port ${PORT}`);
-      console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
-      console.log(`💚 Health Check: http://localhost:${PORT}/api/health`);
+      console.log(`Epic Blog API is running on port ${PORT}`);
+      console.log(`API Documentation: http://localhost:${PORT}/api`);
+      console.log(`Health Check: http://localhost:${PORT}/api/health`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 };

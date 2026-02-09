@@ -34,7 +34,6 @@ const blogSchema = new Schema<IBlogDocument>(
 );
 
 blogSchema.index({ title: 'text', content: 'text', excerpt: 'text' });
-blogSchema.index({ slug: 1 });
 blogSchema.index({ tags: 1 });
 blogSchema.index({ createdAt: -1 });
 

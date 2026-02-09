@@ -1,10 +1,15 @@
 import { Router } from 'express';
 import { blogController } from './blog.controller.js';
 import { authMiddleware, optionalAuthMiddleware } from '../../middleware/auth.middleware.js';
+import { apiKeyMiddleware, requireApiKeyOrJwt } from '../../middleware/api-key.middleware.js';
 import { validateRequest } from '../../middleware/validation.middleware.js';
 import { body } from 'express-validator';
 
 const router = Router();
+
+// Apply API Key middleware to all routes (optional auth)
+router.use(optionalAuthMiddleware);
+router.use(apiKeyMiddleware);
 
 // Validation rules
 const createBlogValidation = [
@@ -36,11 +41,11 @@ router.get('/author/:authorId', optionalAuthMiddleware, blogController.getByAuth
 router.get('/:blogId', blogController.getById.bind(blogController));
 
 // Protected routes
-router.post('/', authMiddleware, createBlogValidation, validateRequest, blogController.create.bind(blogController));
-router.get('/user/my-blogs', authMiddleware, blogController.getMyBlogs.bind(blogController));
-router.put('/:blogId', authMiddleware, updateBlogValidation, validateRequest, blogController.update.bind(blogController));
-router.delete('/:blogId', authMiddleware, blogController.delete.bind(blogController));
-router.post('/:blogId/publish', authMiddleware, blogController.publish.bind(blogController));
-router.post('/:blogId/unpublish', authMiddleware, blogController.unpublish.bind(blogController));
+router.post('/', requireApiKeyOrJwt, createBlogValidation, validateRequest, blogController.create.bind(blogController));
+router.get('/user/my-blogs', requireApiKeyOrJwt, blogController.getMyBlogs.bind(blogController));
+router.put('/:blogId', requireApiKeyOrJwt, updateBlogValidation, validateRequest, blogController.update.bind(blogController));
+router.delete('/:blogId', requireApiKeyOrJwt, blogController.delete.bind(blogController));
+router.post('/:blogId/publish', requireApiKeyOrJwt, blogController.publish.bind(blogController));
+router.post('/:blogId/unpublish', requireApiKeyOrJwt, blogController.unpublish.bind(blogController));
 
 export default router;

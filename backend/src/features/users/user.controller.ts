@@ -101,6 +101,16 @@ export class UserController {
       next(error);
     }
   }
+
+  async getUserByUsername(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const username = req.params.username as string;
+      const user = await userService.getUserByUsername(username);
+      res.status(200).json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const userController = new UserController();

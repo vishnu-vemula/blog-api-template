@@ -88,6 +88,14 @@ export class UserService {
     return this.toUserResponse(user);
   }
 
+  async getUserByUsername(username: string): Promise<IUserResponse> {
+    const user = await userRepository.findByUsername(username);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.toUserResponse(user);
+  }
+
   async updateProfile(userId: string, updateData: IUserUpdate): Promise<IUserResponse> {
     const user = await userRepository.update(userId, updateData);
     if (!user) {

@@ -6,6 +6,10 @@ module.exports = {
     "./public/index.html"
   ],
   theme: {
+  	container: {
+  		center: true,
+  		padding: '1rem',
+  	},
   	extend: {
   		borderRadius: {
   			lg: 'var(--radius)',

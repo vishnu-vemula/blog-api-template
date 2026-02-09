@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { userController } from './user.controller.js';
-import { authMiddleware } from '../../middleware/auth.middleware.js';
+import { authMiddleware, requireRole } from '../../middleware/auth.middleware.js';
 import { validateRequest } from '../../middleware/validation.middleware.js';
 import { body } from 'express-validator';
 
@@ -42,7 +42,8 @@ router.delete('/profile', authMiddleware, userController.deleteAccount.bind(user
 router.put('/change-password', authMiddleware, changePasswordValidation, validateRequest, userController.changePassword.bind(userController));
 
 // Public user browsing
-router.get('/', userController.getAllUsers.bind(userController));
+router.get('/', authMiddleware, requireRole(['admin', 'superadmin']), userController.getAllUsers.bind(userController));
+router.get('/username/:username', userController.getUserByUsername.bind(userController));
 router.get('/:userId', userController.getUserById.bind(userController));
 
 export default router;
