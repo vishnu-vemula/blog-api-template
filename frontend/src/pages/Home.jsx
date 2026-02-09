@@ -599,11 +599,8 @@ const Home = () => {
             
             {/* Brand column */}
             <div className="col-span-2 md:col-span-4 space-y-5">
-              <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-                  <Zap className="h-4.5 w-4.5 text-white" />
-                </div>
-                <span className="text-xl font-bold tracking-tight">WorksAndBlogs</span>
+              <div className="flex items-center">
+                <img src="/logo.png" alt="WorksAndBlogs" className="h-9 w-9 rounded-xl object-contain" />
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
                 The API-first blogging platform built for developers who want to own their content and grow their brand.

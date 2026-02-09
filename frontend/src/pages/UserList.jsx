@@ -14,7 +14,7 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -34,7 +34,7 @@ const UserList = () => {
   }, []);
 
   if (!authLoading && !isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/blogs" replace />;
   }
 
   return (

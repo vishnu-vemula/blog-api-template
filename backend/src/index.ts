@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
+import { sanitizeMiddleware } from './middleware/sanitize.middleware.js';
 
 // Import routes
 import { userRoutes } from './features/users/index.js';
@@ -13,9 +14,12 @@ import { categoryRoutes } from './features/categories/index.js';
 import { commentRoutes } from './features/comments/index.js';
 import { likeRoutes } from './features/likes/index.js';
 import { apiKeyRoutes } from './features/api-keys/index.js';
+import { threadRoutes } from './features/threads/index.js';
+import { followRoutes } from './features/follows/index.js';
 
 // Import middleware
 import { errorHandler } from './middleware/error.middleware.js';
+import { loggerMiddleware } from './middleware/logger.middleware.js';
 
 const app: Application = express();
 
@@ -26,9 +30,13 @@ const CORS_ORIGINS = process.env.CORS_ORIGINS || '*';
 
 // Middleware
 app.use(helmet());
+const corsOrigins = CORS_ORIGINS === '*'
+  ? '*'
+  : CORS_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean);
+
 app.use(cors({
-  origin: CORS_ORIGINS === '*' ? '*' : CORS_ORIGINS.split(','),
-  credentials: true,
+  origin: corsOrigins,
+  credentials: corsOrigins !== '*',
 }));
 
 // Rate limiting
@@ -44,8 +52,14 @@ app.use('/api', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Data sanitization against NoSQL query injection
+app.use(sanitizeMiddleware);
+
 // Prevent parameter pollution
 app.use(hpp());
+
+// Request logging
+app.use(loggerMiddleware);
 
 // Health check endpoint
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -64,6 +78,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/likes', likeRoutes);
 app.use('/api/api-keys', apiKeyRoutes);
+app.use('/api/threads', threadRoutes);
+app.use('/api/follows', followRoutes);
 
 // Root endpoint
 app.get('/api', (_req: Request, res: Response) => {
@@ -119,6 +135,25 @@ app.get('/api', (_req: Request, res: Response) => {
         getStatus: 'GET /api/likes/status/:targetType/:targetId',
         getTargetLikers: 'GET /api/likes/target/:targetType/:targetId',
         getMyLikes: 'GET /api/likes/my-likes',
+      },
+      threads: {
+        create: 'POST /api/threads',
+        getAll: 'GET /api/threads',
+        getById: 'GET /api/threads/:threadId',
+        getByAuthor: 'GET /api/threads/author/:authorId',
+        getByBlog: 'GET /api/threads/blog/:blogId',
+        getMyThreads: 'GET /api/threads/user/my-threads',
+        update: 'PUT /api/threads/:threadId',
+        delete: 'DELETE /api/threads/:threadId',
+        addBlog: 'POST /api/threads/:threadId/blogs',
+        removeBlog: 'DELETE /api/threads/:threadId/blogs/:blogId',
+        reorder: 'PUT /api/threads/:threadId/reorder',
+      },
+      follows: {
+        toggle: 'POST /api/follows/toggle',
+        getStatus: 'GET /api/follows/status/:userId',
+        getFollowers: 'GET /api/follows/:userId/followers',
+        getFollowing: 'GET /api/follows/:userId/following',
       },
     },
   });

@@ -32,17 +32,19 @@ const updateBlogValidation = [
   body('isPublic').optional().isBoolean(),
 ];
 
-// Public routes
+// Protected routes (specific paths MUST come before /:blogId param route)
+router.get('/user/my-blogs', requireApiKeyOrJwt, blogController.getMyBlogs.bind(blogController));
+router.post('/', requireApiKeyOrJwt, createBlogValidation, validateRequest, blogController.create.bind(blogController));
+
+// Public routes (specific paths before param routes)
 router.get('/', blogController.getAll.bind(blogController));
 router.get('/popular', blogController.getPopular.bind(blogController));
 router.get('/tag/:tag', blogController.getByTag.bind(blogController));
 router.get('/slug/:slug', blogController.getBySlug.bind(blogController));
 router.get('/author/:authorId', optionalAuthMiddleware, blogController.getByAuthor.bind(blogController));
-router.get('/:blogId', blogController.getById.bind(blogController));
 
-// Protected routes
-router.post('/', requireApiKeyOrJwt, createBlogValidation, validateRequest, blogController.create.bind(blogController));
-router.get('/user/my-blogs', requireApiKeyOrJwt, blogController.getMyBlogs.bind(blogController));
+// Param routes LAST
+router.get('/:blogId', blogController.getById.bind(blogController));
 router.put('/:blogId', requireApiKeyOrJwt, updateBlogValidation, validateRequest, blogController.update.bind(blogController));
 router.delete('/:blogId', requireApiKeyOrJwt, blogController.delete.bind(blogController));
 router.post('/:blogId/publish', requireApiKeyOrJwt, blogController.publish.bind(blogController));

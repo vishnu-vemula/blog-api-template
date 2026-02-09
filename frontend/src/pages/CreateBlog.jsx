@@ -7,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Image as ImageIcon, X } from "lucide-react";
+import { DefaultEditor } from "react-simple-wysiwyg";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 const API = `${BACKEND_URL}/api`;
@@ -27,7 +28,8 @@ const CreateBlog = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.title.trim() || !formData.content.trim()) {
+    const plainText = formData.content.replace(/<[^>]*>/g, "").trim();
+    if (!formData.title.trim() || !plainText) {
       toast.error("Title and content are required");
       return;
     }
@@ -131,15 +133,13 @@ const CreateBlog = () => {
             <Label htmlFor="content" className="text-sm font-medium">
               Content
             </Label>
-            <textarea
-              id="content"
-              value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Write your story here..."
-              rows={12}
-              className="flex w-full rounded-xl border bg-white border-black/[0.1] focus:border-violet-500/50 px-4 py-3 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-500/50 resize-y transition-colors"
-              required
-            />
+            <div className="rsw-editor-wrapper rounded-xl border border-black/[0.1] overflow-hidden bg-white focus-within:border-violet-500/50 focus-within:ring-1 focus-within:ring-violet-500/50 transition-all [&_.rsw-editor]:min-h-[300px] [&_.rsw-editor]:px-4 [&_.rsw-editor]:py-3 [&_.rsw-editor]:text-base [&_.rsw-editor]:leading-relaxed [&_.rsw-editor]:outline-none [&_.rsw-toolbar]:border-b [&_.rsw-toolbar]:border-black/[0.06] [&_.rsw-toolbar]:bg-black/[0.01] [&_.rsw-btn]:rounded-md [&_.rsw-btn]:transition-colors [&_.rsw-separator]:mx-1">
+              <DefaultEditor
+                value={formData.content}
+                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                placeholder="Write your story here..."
+              />
+            </div>
           </div>
         </div>
 

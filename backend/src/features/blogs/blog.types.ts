@@ -72,6 +72,14 @@ export interface IBlogResponse {
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  thread?: {
+    id: string;
+    title: string;
+    currentIndex: number;
+    totalPosts: number;
+    previousBlogId?: string;
+    nextBlogId?: string;
+  };
 }
 
 export interface IBlogListResponse {

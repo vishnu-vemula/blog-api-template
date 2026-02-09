@@ -5,6 +5,7 @@ import { IBlogCreate, IBlogUpdate, IBlogResponse, IBlogListResponse, IBlogFilter
 import { IBlogDocument } from './blog.model.js';
 import { userRepository } from '../users/user.repository.js';
 import { categoryRepository } from '../categories/category.repository.js';
+import { threadRepository } from '../threads/thread.repository.js';
 
 export class BlogService {
   private async toBlogResponse(blog: IBlogDocument, includeAuthor: boolean = true): Promise<IBlogResponse> {
@@ -50,6 +51,20 @@ export class BlogService {
           slug: category.slug,
         };
       }
+    }
+
+    // Thread context
+    const thread = await threadRepository.findThreadByBlogId(blog.id);
+    if (thread) {
+      const idx = thread.blogIds.indexOf(blog.id);
+      response.thread = {
+        id: thread.id,
+        title: thread.title,
+        currentIndex: idx,
+        totalPosts: thread.blogIds.length,
+        previousBlogId: idx > 0 ? thread.blogIds[idx - 1] : undefined,
+        nextBlogId: idx < thread.blogIds.length - 1 ? thread.blogIds[idx + 1] : undefined,
+      };
     }
 
     return response;

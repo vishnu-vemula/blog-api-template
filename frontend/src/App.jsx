@@ -16,19 +16,38 @@ import EditProfile from "./pages/EditProfile";
 import Docs from "./pages/Docs";
 import UserPublicPage from "./pages/UserPublicPage";
 import CreateBlog from "./pages/CreateBlog";
+import BlogDetail from "./pages/BlogDetail";
+import ThreadView from "./pages/ThreadView";
+import ThreadManager from "./pages/ThreadManager";
 import { useState, useEffect } from "react";
 import { useAuth } from "./context/AuthContext";
 
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-12 w-12 rounded-full border-2 border-violet-200 border-t-violet-600 animate-spin" />
+      <p className="text-sm text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 };
 
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageLoader />;
+  if (user) return <Navigate to="/blogs" replace />;
+  return children;
+};
+
+const LandingRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <PageLoader />;
   if (user) return <Navigate to="/blogs" replace />;
   return children;
 };
@@ -76,13 +95,16 @@ const SubdomainRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index element={<LandingRoute><Home /></LandingRoute>} />
         <Route path="login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="register" element={<GuestRoute><Register /></GuestRoute>} />
         <Route path="api-keys" element={<ProtectedRoute><ApiKeyManager /></ProtectedRoute>} />
         <Route path="users" element={<ProtectedRoute><UserList /></ProtectedRoute>} />
         <Route path="profile/:userId" element={<UserProfile />} />
         <Route path="blogs" element={<BlogList />} />
+        <Route path="blogs/:blogId" element={<BlogDetail />} />
+        <Route path="threads" element={<ProtectedRoute><ThreadManager /></ProtectedRoute>} />
+        <Route path="threads/:threadId" element={<ThreadView />} />
         <Route path="write" element={<ProtectedRoute><CreateBlog /></ProtectedRoute>} />
         <Route path="edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
         <Route path="docs" element={<Docs />} />

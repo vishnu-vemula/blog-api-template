@@ -27,6 +27,19 @@ export const errorHandler = (
     'Category with this name already exists': 409,
     'Blog not available': 404,
     'Current password is incorrect': 400,
+    'Thread not found': 404,
+    'Not authorized to update this thread': 403,
+    'Not authorized to delete this thread': 403,
+    'Not authorized to modify this thread': 403,
+    'does not belong to you': 403,
+    'is already in thread': 409,
+    'is already in this thread': 409,
+    'Blog is already in another thread': 409,
+    'Reorder must contain the same blog IDs': 400,
+    'Failed to update thread': 500,
+    'Failed to add blog to thread': 500,
+    'Failed to remove blog from thread': 500,
+    'You cannot follow yourself': 400,
   };
 
   for (const [message, statusCode] of Object.entries(errorMessages)) {

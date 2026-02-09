@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { categoryController } from './category.controller.js';
-import { authMiddleware } from '../../middleware/auth.middleware.js';
+import { authMiddleware, requireRole } from '../../middleware/auth.middleware.js';
 import { validateRequest } from '../../middleware/validation.middleware.js';
 import { body } from 'express-validator';
 
@@ -27,8 +27,8 @@ router.get('/slug/:slug', categoryController.getBySlug.bind(categoryController))
 router.get('/:categoryId', categoryController.getById.bind(categoryController));
 
 // Protected routes (admin only in real app)
-router.post('/', authMiddleware, createCategoryValidation, validateRequest, categoryController.create.bind(categoryController));
-router.put('/:categoryId', authMiddleware, updateCategoryValidation, validateRequest, categoryController.update.bind(categoryController));
-router.delete('/:categoryId', authMiddleware, categoryController.delete.bind(categoryController));
+router.post('/', authMiddleware, requireRole(['admin', 'superadmin']), createCategoryValidation, validateRequest, categoryController.create.bind(categoryController));
+router.put('/:categoryId', authMiddleware, requireRole(['admin', 'superadmin']), updateCategoryValidation, validateRequest, categoryController.update.bind(categoryController));
+router.delete('/:categoryId', authMiddleware, requireRole(['admin', 'superadmin']), categoryController.delete.bind(categoryController));
 
 export default router;

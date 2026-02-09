@@ -10,7 +10,11 @@ export class UserService {
   private readonly jwtExpiresIn: string;
 
   constructor() {
-    this.jwtSecret = process.env.JWT_SECRET || 'fallback_secret';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not set');
+    }
+    this.jwtSecret = jwtSecret;
     this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '7d';
   }
 

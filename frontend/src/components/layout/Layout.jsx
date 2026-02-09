@@ -14,7 +14,8 @@ import {
   TrendingUp,
   Zap,
   Settings,
-  Book
+  Book,
+  Layers
 } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -26,14 +27,24 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-4">
+      <div className="h-12 w-12 rounded-full border-2 border-violet-200 border-t-violet-600 animate-spin" />
+      <p className="text-sm text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
+
 const Layout = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isFullWidthPage = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/docs';
+  const isFeedPage = location.pathname === '/blogs';
+  const isFullWidthPage = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/docs' || isFeedPage;
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
   const allNavItems = [
     { icon: Home, label: "Feed", path: "/blogs" },
@@ -45,24 +56,26 @@ const Layout = () => {
   const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
 
   const personalItems = [
+    { icon: Layers, label: "Threads", path: "/threads" },
     { icon: Key, label: "API Keys", path: "/api-keys" },
     { icon: User, label: "Profile", path: user ? `/profile/${user.id}` : "/login" },
   ];
 
+  if (loading) {
+    return <PageLoader />;
+  }
+
   return (
     <div className="min-h-screen bg-background font-sans text-foreground flex flex-col">
       
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 w-full glass border-b border-black/[0.06]">
-        <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
+      {!isFeedPage && (
+        <header className="sticky top-0 z-50 w-full glass border-b border-black/[0.06]">
+          <nav className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
           
           {/* Left: Logo + Nav Links */}
           <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-shadow">
-                <Zap className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight hidden sm:block">WorksAndBlogs</span>
+            <Link to="/" className="flex items-center group">
+              <img src="/logo.png" alt="WorksAndBlogs" className="h-10 w-10 rounded-lg object-contain" />
             </Link>
 
             {/* Desktop Nav */}
@@ -154,8 +167,9 @@ const Layout = () => {
               <Menu className="h-4 w-4" />
             </Button>
           </div>
-        </nav>
-      </header>
+          </nav>
+        </header>
+      )}
 
       {/* Main Content — flex-1 ensures it fills remaining space, NO max-width restriction on children */}
       <div className="flex-1 flex flex-col">
@@ -171,7 +185,7 @@ const Layout = () => {
       </div>
       
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
+      {!isFeedPage && isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
           <div className="absolute inset-y-0 left-0 w-72 bg-white border-r border-black/[0.06] p-6 shadow-2xl">

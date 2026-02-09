@@ -2,6 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { ITokenPayload } from '../features/users/user.types.js';
 
+const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not set');
+  }
+  return secret;
+};
+
 // Extend Express Request type
 declare global {
   namespace Express {
@@ -21,7 +29,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     }
 
     const token = authHeader.split(' ')[1];
-    const jwtSecret = process.env.JWT_SECRET || 'fallback_secret';
+    const jwtSecret = getJwtSecret();
     
     const decoded = jwt.verify(token, jwtSecret) as ITokenPayload;
     req.user = decoded;
@@ -37,7 +45,7 @@ export const optionalAuthMiddleware = (req: Request, res: Response, next: NextFu
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const jwtSecret = process.env.JWT_SECRET || 'fallback_secret';
+      const jwtSecret = getJwtSecret();
       const decoded = jwt.verify(token, jwtSecret) as ITokenPayload;
       req.user = decoded;
     }
